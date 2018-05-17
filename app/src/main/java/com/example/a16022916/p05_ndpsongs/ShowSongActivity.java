@@ -14,6 +14,7 @@ public class ShowSongActivity extends AppCompatActivity {
 
     public DatabaseHelper db = new DatabaseHelper(this);
 
+    int requestCodeForInsertSong = 1;
     ListView lvSongs;
     Button btnShow5Stars;
     ArrayList<Song> songList;
@@ -32,12 +33,14 @@ public class ShowSongActivity extends AppCompatActivity {
         caSong = new CustomAdapter(this, R.layout.song_list_row, songList);
         lvSongs.setAdapter(caSong);
 
+
+
         lvSongs.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Intent intent = new Intent(getBaseContext(), ModifySongActivity.class);
                 intent.putExtra("songId",songList.get(i).getId());
-                startActivity(intent);
+                startActivityForResult(intent, requestCodeForInsertSong);
             }
         });
         btnShow5Stars.setOnClickListener(new View.OnClickListener() {
@@ -46,5 +49,11 @@ public class ShowSongActivity extends AppCompatActivity {
 
             }
         });
+    }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data){
+        super.onActivityResult(requestCode,resultCode,data);
+
+        caSong.notifyDataSetChanged();
     }
 }

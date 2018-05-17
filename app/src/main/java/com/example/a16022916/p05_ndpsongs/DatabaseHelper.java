@@ -77,7 +77,9 @@ public class DatabaseHelper extends SQLiteOpenHelper{
 
             } while (cursor.moveToNext());
         }
+        db.close();
         return songList;
+
     }
 
     public Song getSongById(int id) {
@@ -86,24 +88,39 @@ public class DatabaseHelper extends SQLiteOpenHelper{
 
 //        String query  = "SELECT * FROM " + TABLE_NAME;
         Cursor cursor = db.query(TABLE_NAME, new String[] { COL0ID,
-                        COL1SONG_TITLE, COL2SINGERS , COL3YEAR }, COL0ID + "=?",
+                        COL1SONG_TITLE, COL2SINGERS , COL3YEAR, COL4Rating }, COL0ID + "=?",
                 new String[] { String.valueOf(id) }, null, null, null, null);
 
-        if (cursor != null)
-            cursor.moveToFirst();
 
-        Song songList = new Song(cursor.getInt(0),cursor.getString(1),cursor.getString(2),cursor.getInt(3),cursor.getInt(4));
+        if(cursor.moveToFirst()) {
+            Song retSong = new Song(cursor.getInt(0), cursor.getString(1), cursor.getString(2), cursor.getInt(3), cursor.getInt(4));
+            return retSong;
+        }else{
+            return null;
+        }
 
-        return songList;
+
     }
-//    public int updateNode(Note data){
-//        SQLITEDatabse db = this.getWritableDatabase();
-//        ContentValues values = new ContentValues();
-//        values.put(COLUMN_NOTE_CONTENT, data.getNoteContetn());
-//        String condition  = COLUMN_ID + " = ?";
-//        String[] args = {String.valueOf(data.getId())};
-//        int result = db.update(TABLE)NOTE, values,condition,args);
-//db.close();
-//return result;//number of data modified
-//    }
+
+    public void updateSong(Song song){
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COL1SONG_TITLE, song.getTitle());
+        values.put(COL2SINGERS, song.getSinger());
+        values.put(COL3YEAR,song.getYear());
+        values.put(COL4Rating,song.getRating());
+        String condition = COL0ID + " =?";
+        String[] args = {String.valueOf(song.getId())};
+        db.update(TABLE_NAME,values,condition,args);
+        db.close();
+
+    }
+
+    public void deleteSong(Song song){
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        db.delete(TABLE_NAME, COL0ID + "=?", new String[]{String.valueOf(song.getId())});
+        db.close();
+    }
+
 }
